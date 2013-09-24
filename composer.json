@@ -1,0 +1,23 @@
+{
+	"name": "bhutanio/laravel-bencode",
+	"description": "A BEncode Wrapper for Laravel",
+	"license": "MIT",
+	"keywords": ["laravel", "bencode", "bdecode", "bdecode_file"],
+	"authors": [
+		{
+			"name": "Abi Xalmon",
+			"email": "abixalmon@hotmail.com"
+		}
+	],
+	"require": {
+		"php": ">=5.3.0",
+		"illuminate/support": "4.0.x"
+	},
+
+	"autoload": {
+		"psr-0": {
+			"BEncode": "src/"
+		}
+	},
+	"minimum-stability": "dev"
+}
