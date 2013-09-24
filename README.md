@@ -1,4 +1,128 @@
-laravel-bdecode
+Bencode for Laravel 4
 ===============
+Bencode (pronounced like B encode) is the encoding used by the peer-to-peer file sharing system BitTorrent for storing and transmitting loosely structured data.
 
-Decoding encoding bencoded data for Laravel 4
+It supports four different types of values:
+* byte strings,
+* integers,
+* lists, and
+* dictionaries (associative arrays).
+
+Bencoding is most commonly used in torrent files. These metadata files are simply bencoded dictionaries.
+
+While less efficient than a pure binary encoding, bencoding is simple and (because numbers are encoded as text in decimal notation) is unaffected by endianness, which is important for a cross-platform application like BitTorrent. It is also fairly flexible, as long as applications ignore unexpected dictionary keys, so that new ones can be added without creating incompatibilities.
+
+##Requirements
+	Apache or Nginx = Latest production version
+	PHP >= 5.4.0 (with MCrypt PHP Extension)
+	Laravel >= 4.0
+
+##Installation
+
+Require this package in your composer.json and update composer.
+
+```
+"bhutanio/laravel-bencode": "dev-master"
+```
+
+__Update Composer__
+
+```composer update``` or ```php composer.phar update```
+
+__Register the Class and Facade__
+
+In __app/config/app.php__ add a provider and an aliase.
+```php
+'providers' => array(
+  'Bhutanio\BEncode\ServiceProvider',
+);
+
+
+'aliases' => array(
+  'BENCODE'         => 'Bhutanio\BEncode\Facade',
+);
+
+```
+
+##Usage
+
+Simple Example
+
+
+```php
+BENCODE::set([
+		'announce'=>'http://www.private-tracker.com',
+		'comment'=>'Downloaded from Private Tracker',
+		'created_by'=>'PrivateTracker v1.0'
+		]);
+
+$torrent = BENCODE::bdecode( File::get('AwesomeMovie.torrent'));
+$torrent = BENCODE::make_private($torrent);
+$infohash = sha1(BENCODE::bencode($torrent["info"]));
+$binhash = pack("H*", sha1(BENCODE::bencode($torrent["info"])));
+
+print_r($torrent);
+
+```
+
+##Functions
+
+```php
+/**
+ * Data Setter
+ * @param array $data [array of public variables]
+ * eg:
+ * 
+ * 	BENCODE::set([
+ *		'announce'=>'http://www.torrentsite.com',
+ *		'comment'=>'Downloaded from torrentsite.com',
+ *		'created_by'=>'TorrentSite v1.0'
+ *	]);
+ */
+public function set($data=array()) {}
+
+
+/**
+ * Decode a torrent file into Bencoded data
+ * @param  string  $s 	[link to torrent file]
+ * @param  integer $pos [file position pointer]
+ * @return array/null 	[Array of Bencoded data]
+ * eg:
+ * 		$torrent = BENCODE::bdecode( File::get('MyMovieTorrent.torrent'));
+ *  	var_dump($torrent);
+ */
+public function bdecode($s, &$pos=0) {}
+
+
+/**
+ * Create Torrent file from Bencoded data
+ * @param  array $d [array data of a decoded torrent file]
+ * @return string 	[data can be downloaded as torrent]
+ */
+public function bencode(&$d) {}
+
+
+/**
+* Decode a torrent file into Bencoded data
+* @param  string $filename 	[File Path]
+* @return array/null 			[Array of Bencoded data]
+*/
+public function bdecode_file($filename) {}
+
+
+/**
+* Generate list of files in a torrent
+* @param  array $data 	[array data of a decoded torrent file]
+* @return array 		[list of files in an array]
+*/
+public function filelist($data) {}
+
+
+/**
+* Replace array data on Decoded torrent data so that it can be bencoded into a private torrent file.
+* Provide the custom data using BENCODE::set();
+* @param  array $data 	[array data of a decoded torrent file]
+* @return array 		[array data for torrent file]
+*/
+public function make_private($data)
+
