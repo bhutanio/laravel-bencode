@@ -1,5 +1,8 @@
 Bencode for Laravel 4
 ===============
+
+## Moved to - [torrent-bencode](https://github.com/bhutanio/torrent-bencode)
+
 Bencode (pronounced like B encode) is the encoding used by the peer-to-peer file sharing system BitTorrent for storing and transmitting loosely structured data.
 
 It supports four different types of values:
