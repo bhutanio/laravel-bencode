@@ -10,7 +10,7 @@ namespace Bhutanio\BEncode;
  * @package laravel-bencode
  * @author Abi Xalmon
  */
-class BENCODE {
+class BEncode {
 	
 	//public $announce = 'http://abi.io/announce';
 	public $announce = null;

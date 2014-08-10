@@ -39,7 +39,7 @@ In __app/config/app.php__ add a provider and an aliase.
 
 
 'aliases' => array(
-  'BENCODE'         => 'Bhutanio\BEncode\Facade',
+  'BEncode'         => 'Bhutanio\BEncode\Facade',
 );
 
 ```
@@ -50,16 +50,16 @@ Simple Example
 
 
 ```php
-BENCODE::set([
+BEncode::set([
 		'announce'=>'http://www.private-tracker.com',
 		'comment'=>'Downloaded from Private Tracker',
 		'created_by'=>'PrivateTracker v1.0'
 		]);
 
-$torrent = BENCODE::bdecode( File::get('AwesomeMovie.torrent'));
-$torrent = BENCODE::make_private($torrent);
-$infohash = sha1(BENCODE::bencode($torrent["info"]));
-$binhash = pack("H*", sha1(BENCODE::bencode($torrent["info"])));
+$torrent = BEncode::bdecode( File::get('AwesomeMovie.torrent'));
+$torrent = BEncode::make_private($torrent);
+$infohash = sha1(BEncode::bencode($torrent["info"]));
+$binhash = pack("H*", sha1(BEncode::bencode($torrent["info"])));
 
 print_r($torrent);
 
@@ -73,7 +73,7 @@ print_r($torrent);
  * @param array $data [array of public variables]
  * eg:
  * 
- * 	BENCODE::set([
+ * 	BEncode::set([
  *		'announce'=>'http://www.torrentsite.com',
  *		'comment'=>'Downloaded from torrentsite.com',
  *		'created_by'=>'TorrentSite v1.0'
@@ -88,7 +88,7 @@ public function set($data=array()) {}
  * @param  integer $pos [file position pointer]
  * @return array/null 	[Array of Bencoded data]
  * eg:
- * 		$torrent = BENCODE::bdecode( File::get('MyMovieTorrent.torrent'));
+ * 		$torrent = BEncode::bdecode( File::get('MyMovieTorrent.torrent'));
  *  	var_dump($torrent);
  */
 public function bdecode($s, &$pos=0) {}
@@ -120,7 +120,7 @@ public function filelist($data) {}
 
 /**
 * Replace array data on Decoded torrent data so that it can be bencoded into a private torrent file.
-* Provide the custom data using BENCODE::set();
+* Provide the custom data using BEncode::set();
 * @param  array $data 	[array data of a decoded torrent file]
 * @return array 		[array data for torrent file]
 */

@@ -31,7 +31,7 @@ class ServiceProvider extends IlluminateServiceProvider {
 	{
 		$this->app['bencode'] = $this->app->share(function($app)
 			{
-				return new BENCODE;
+				return new BEncode;
 			});
 	}
 
