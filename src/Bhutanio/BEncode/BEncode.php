@@ -1,18 +1,20 @@
 <?php
-namespace Bhutanio\BEncode;
+
+namespace Bhutanio;
 
 /**
- * A BEncode Wrapper for Laravel
+ * PHP Library for decoding and encoding BitTorrent BEncoded data
  * Original src - https://wiki.theory.org/Decoding_encoding_bencoded_data_with_PHP
  * 
- * GIT :: https://github.com/bhutanio/laravel-bencode
+ * GIT :: https://github.com/bhutanio/torrent-bencode
  * 
- * @package laravel-bencode
- * @author Abi Xalmon
+ * @package torrent-bencode
+ * @author abixalmon
  */
+
 class BEncode {
 	
-	//public $announce = 'http://abi.io/announce';
+	//public $announce = 'http://example.com/announce';
 	public $announce = null;
 	// Torrent Comment
 	public $comment = null;
@@ -23,23 +25,28 @@ class BEncode {
 		// Here you can load default announce URL, comment and created_by from your configuration file.
 	}
 
-	// Set torrent data
 	/**
 	 * Data Setter
 	 * @param array $data [array of public variables]
 	 * eg:
-	 * 
-	 * 	BENCODE::set([
-	 *		'announce'=>'http://www.torrentsite.com',
-	 *		'comment'=>'Downloaded from torrentsite.com',
+	 *  $bcoder = new \Bhutanio\BEncode;
+	 * 	$bcoder->set([
+	 *		'announce'=>'http://www.example.com',
+	 *		'comment'=>'Downloaded from example.com',
 	 *		'created_by'=>'TorrentSite v1.0'
 	 *	]);
 	 */
 	public function set($data=array())
 	{
 		if ( is_array($data) ) {
-			foreach ($data as $key => $value) {
-				$this->$key = $value;
+			if ( isset($data['announce']) ) {
+				$this->announce = $data['announce'];
+			}
+			if ( isset($data['comment']) ) {
+				$this->comment = $data['comment'];
+			}
+			if ( isset($data['created_by']) ) {
+				$this->created_by = $data['created_by'];
 			}
 		}
 	}
@@ -50,7 +57,8 @@ class BEncode {
 	 * @param  integer $pos [file position pointer]
 	 * @return array/null 	[Array of Bencoded data]
 	 * eg:
-	 * 		$torrent = BENCODE::bdecode( File::get('MyMovieTorrent.torrent'));
+	 * 		$bcoder = new \Bhutanio\BEncode;
+	 * 		$torrent = $bcoder->bdecode( File::get('MyAwesomeTorrent.torrent'));
 	 *  	var_dump($torrent);
 	 */
 	public function bdecode($s, &$pos=0)
@@ -63,8 +71,8 @@ class BEncode {
 			$pos++;
 			$retval=array();
 			while ($s[$pos]!='e'){
-				$key=BENCODE::bdecode($s, $pos);
-				$val=BENCODE::bdecode($s, $pos);
+				$key=$this->bdecode($s, $pos);
+				$val=$this->bdecode($s, $pos);
 				if ($key===null || $val===null)
 					break;
 				$retval[$key]=$val;
@@ -77,7 +85,7 @@ class BEncode {
 			$pos++;
 			$retval=array();
 			while ($s[$pos]!='e'){
-				$val=BENCODE::bdecode($s, $pos);
+				$val=$this->bdecode($s, $pos);
 				if ($val===null)
 					break;
 				$retval[]=$val;
@@ -92,8 +100,8 @@ class BEncode {
 			$pos+=$digits+1;
 			return $val;
 
-	//	case "0": case "1": case "2": case "3": case "4":
-	//	case "5": case "6": case "7": case "8": case "9":
+		// case "0": case "1": case "2": case "3": case "4":
+		// case "5": case "6": case "7": case "8": case "9":
 		default:
 			$digits=strpos($s, ':', $pos)-$pos;
 			if ($digits<0 || $digits >20)
@@ -135,7 +143,7 @@ class BEncode {
 				}else if (is_string($value)) {
 					$ret.=strlen($value).":".$value;
 				} else {
-					$ret.=BENCODE::bencode ($value);
+					$ret.=$this->bencode ($value);
 				}
 			}
 			return $ret."e";
@@ -156,7 +164,7 @@ class BEncode {
 	{
 		if ( is_file($filename) ) {
 			$f=file_get_contents($filename, FILE_BINARY);
-			return BENCODE::bdecode($f);
+			return $this->bdecode($f);
 		}
 		return null;
 	}
@@ -196,15 +204,14 @@ class BEncode {
 
 	/**
 	 * Replace array data on Decoded torrent data so that it can be bencoded into a private torrent file.
-	 * Provide the custom data using BENCODE::set();
+	 * Provide the custom data using $this->set();
 	 * @param  array $data 	[array data of a decoded torrent file]
 	 * @return array 		[array data for torrent file]
 	 */
 	public function make_private($data)
 	{
 		// Remove announce
-		// announce-list is an unofficial extension to the protocol
-		// that allows for multiple trackers per torrent
+		// announce-list is an unofficial extension to the protocol that allows for multiple trackers per torrent
 		unset($data['announce']);
 		unset($data['announce-list']);
 
