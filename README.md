@@ -49,15 +49,40 @@ In __app/config/app.php__ add a provider and an aliase.
 
 ##Usage
 
-Simple Example
-
+*Simple Example*
 
 ```php
-BEncode::set([
+	$bcoder = new BEncode;
+	$bcoder->set([
 		'announce'=>'http://www.private-tracker.com',
 		'comment'=>'Downloaded from Private Tracker',
 		'created_by'=>'PrivateTracker v1.0'
-		]);
+	]);
+	
+	// decode Torrent file
+	$torrent = $bcoder->bdecode( File::get('AwesomeMovie.torrent'));
+	print_r($torrent);
+	
+	// show Torrent contents
+	$files = $bcoder->filelist( $torrent );
+	print_r($files);
+	
+	// make Torrent private
+	$torrent = $bcoder->make_private($torrent);
+	print_r($torrent);
+	
+	$infohash = sha1($bcoder->bencode($torrent["info"]));
+	$binhash = pack("H*", $bcoder->bencode($torrent["info"])));
+```
+
+*Static Method*
+
+```php
+BEncode::set([
+        'announce'=>'http://www.private-tracker.com',
+        'comment'=>'Downloaded from Private Tracker',
+        'created_by'=>'PrivateTracker v1.0'
+	]);
 
 $torrent = BEncode::bdecode( File::get('AwesomeMovie.torrent'));
 $torrent = BEncode::make_private($torrent);
@@ -65,7 +90,6 @@ $infohash = sha1(BEncode::bencode($torrent["info"]));
 $binhash = pack("H*", sha1(BEncode::bencode($torrent["info"])));
 
 print_r($torrent);
-
 ```
 
 ##Functions
@@ -75,15 +99,14 @@ print_r($torrent);
  * Data Setter
  * @param array $data [array of public variables]
  * eg:
- * 
- * 	BEncode::set([
- *		'announce'=>'http://www.torrentsite.com',
- *		'comment'=>'Downloaded from torrentsite.com',
+ *  $bcoder = new \Bhutanio\BEncode;
+ * 	$bcoder->set([
+ *		'announce'=>'http://www.example.com',
+ *		'comment'=>'Downloaded from example.com',
  *		'created_by'=>'TorrentSite v1.0'
  *	]);
  */
 public function set($data=array()) {}
-
 
 /**
  * Decode a torrent file into Bencoded data
@@ -91,41 +114,38 @@ public function set($data=array()) {}
  * @param  integer $pos [file position pointer]
  * @return array/null 	[Array of Bencoded data]
  * eg:
- * 		$torrent = BEncode::bdecode( File::get('MyMovieTorrent.torrent'));
+ * 		$bcoder = new \Bhutanio\BEncode;
+ * 		$torrent = $bcoder->bdecode( File::get('MyAwesomeTorrent.torrent'));
  *  	var_dump($torrent);
  */
 public function bdecode($s, &$pos=0) {}
 
-
 /**
- * Create Torrent file from Bencoded data
+ * Created Torrent file from Bencoded data
  * @param  array $d [array data of a decoded torrent file]
  * @return string 	[data can be downloaded as torrent]
  */
 public function bencode(&$d) {}
 
-
 /**
-* Decode a torrent file into Bencoded data
-* @param  string $filename 	[File Path]
-* @return array/null 			[Array of Bencoded data]
-*/
+ * Decode a torrent file into Bencoded data
+ * @param  string $filename 	[File Path]
+ * @return array/null 			[Array of Bencoded data]
+ */
 public function bdecode_file($filename) {}
 
-
 /**
-* Generate list of files in a torrent
-* @param  array $data 	[array data of a decoded torrent file]
-* @return array 		[list of files in an array]
-*/
+ * Generate list of files in a torrent
+ * @param  array $data 	[array data of a decoded torrent file]
+ * @return array 		[list of files in an array]
+ */
 public function filelist($data) {}
 
-
 /**
-* Replace array data on Decoded torrent data so that it can be bencoded into a private torrent file.
-* Provide the custom data using BEncode::set();
-* @param  array $data 	[array data of a decoded torrent file]
-* @return array 		[array data for torrent file]
-*/
-public function make_private($data)
-
+ * Replace array data on Decoded torrent data so that it can be bencoded into a private torrent file.
+ * Provide the custom data using $this->set();
+ * @param  array $data 	[array data of a decoded torrent file]
+ * @return array 		[array data for torrent file]
+ */
+public function make_private($data) {}
+```
